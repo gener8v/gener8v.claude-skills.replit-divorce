@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# Local environment
+.env
+.env.local
+
+# Claude Code working dirs (in case anyone clones into a project that uses them)
+.claude-user
