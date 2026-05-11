@@ -20,14 +20,51 @@ A meta-skill, **`orchestrator`**, triages a target project's current state and s
 
 ## What's in the box
 
+The pack has **24 skills** organized hierarchically: one orchestrator, three phase coordinators, and twenty sub-skills.
+
+### Orchestrator
+
 | Skill | When Claude invokes it |
 | --- | --- |
-| [`orchestrator`](skills/replit-divorce/SKILL.md) | "Help me move this Replit project to GCP / Railway / a real server." Triages state, sequences the right phase skills. |
-| [`replit-audit`](skills/replit-audit/SKILL.md) | Discovery pass on an unfamiliar Replit project. Produces an inventory of portability concerns, security debt, and deployment-coupling. |
-| [`replit-localize`](skills/replit-localize/SKILL.md) | Make a Replit project runnable locally without Replit-managed services. Output: working `npm install && npm run setup && npm run dev` on a clean machine. |
-| [`replit-to-gcp`](skills/replit-to-gcp/SKILL.md) | Provision GCP infrastructure (Cloud Run + Cloud SQL + Secret Manager + WIF + GHA) for a Replit-localized project and ship the first deploy. |
+| [`replit-divorce`](skills/replit-divorce/SKILL.md) | "Help me move this Replit project to GCP." Triages target state, sequences the right phase skills. |
 
-Each phase skill references finer-grained recipes for specific subproblems — Dockerfile patterns, Terraform slices, secret-rotation discipline. Those live alongside the phase skills under [`skills/`](skills/) and are independently invocable when Claude already knows which sub-problem it's solving.
+### Phase coordinators
+
+| Skill | What the phase produces |
+| --- | --- |
+| [`replit-audit`](skills/replit-audit/SKILL.md) | A written inventory of Replit-coupling, security debt, and portability concerns. Read-only. |
+| [`replit-localize`](skills/replit-localize/SKILL.md) | A working `npm install && npm run setup && npm run dev` on a fresh clone. Modifies the codebase across multiple commits. |
+| [`replit-to-gcp`](skills/replit-to-gcp/SKILL.md) | GCP Cloud Run + Cloud SQL + Secret Manager + WIF + GHA pipeline. Writes code; operator gates each `terraform apply`. |
+
+### Sub-skills (independently invokable)
+
+Each phase coordinator delegates to multiple sub-skills. When Claude already knows what sub-problem it's solving, it can invoke a sub-skill directly without going through the phase coordinator.
+
+**Phase 1 — Audit (5 sub-skills):**
+[`replit-audit-config`](skills/replit-audit-config/SKILL.md) ·
+[`replit-audit-deps`](skills/replit-audit-deps/SKILL.md) ·
+[`replit-audit-env-vars`](skills/replit-audit-env-vars/SKILL.md) ·
+[`replit-audit-lifecycle-scripts`](skills/replit-audit-lifecycle-scripts/SKILL.md) ·
+[`replit-audit-security`](skills/replit-audit-security/SKILL.md)
+
+**Phase 2 — Localize (6 sub-skills):**
+[`replit-localize-compose-postgres`](skills/replit-localize-compose-postgres/SKILL.md) ·
+[`replit-localize-dotenv`](skills/replit-localize-dotenv/SKILL.md) ·
+[`replit-localize-migration-consolidation`](skills/replit-localize-migration-consolidation/SKILL.md) ·
+[`replit-localize-boot-verification`](skills/replit-localize-boot-verification/SKILL.md) ·
+[`replit-localize-security-cleanup`](skills/replit-localize-security-cleanup/SKILL.md) ·
+[`replit-localize-dep-cleanup`](skills/replit-localize-dep-cleanup/SKILL.md)
+
+**Phase 3 — Deploy to GCP (9 sub-skills):**
+[`replit-to-gcp-platform-eval`](skills/replit-to-gcp-platform-eval/SKILL.md) ·
+[`replit-to-gcp-dockerfile`](skills/replit-to-gcp-dockerfile/SKILL.md) ·
+[`replit-to-gcp-terraform-foundation`](skills/replit-to-gcp-terraform-foundation/SKILL.md) ·
+[`replit-to-gcp-terraform-cloud-sql`](skills/replit-to-gcp-terraform-cloud-sql/SKILL.md) ·
+[`replit-to-gcp-terraform-secrets`](skills/replit-to-gcp-terraform-secrets/SKILL.md) ·
+[`replit-to-gcp-terraform-cloud-run`](skills/replit-to-gcp-terraform-cloud-run/SKILL.md) ·
+[`replit-to-gcp-terraform-wif`](skills/replit-to-gcp-terraform-wif/SKILL.md) ·
+[`replit-to-gcp-gha-deploy`](skills/replit-to-gcp-gha-deploy/SKILL.md) ·
+[`replit-to-gcp-runbook`](skills/replit-to-gcp-runbook/SKILL.md)
 
 ## Quick start
 
